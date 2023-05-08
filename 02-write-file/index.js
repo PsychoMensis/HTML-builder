@@ -7,8 +7,10 @@ const rl = readline.createInterface({
 });
 
 const filePath = './02-write-file/text.txt';
-
-console.log('Hello, please enter some text:');
+fs.writeFile(filePath, '', (err) => {
+    if (err) throw err;
+    console.log('Hello, please enter some text:');
+});
 
 rl.on('line', (input) => {
   if (input === 'exit') {
