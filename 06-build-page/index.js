@@ -50,18 +50,32 @@ async function buildPage() {
 
     // Copy assets directory
     const assetsDir = path.join(__dirname, "assets");
-    const assetsDistDir = path.join(__dirname, "project-dist", "assets");
+    const assetsDistDir = path.join(__dirname, "project-dist");
     await fs.mkdir(assetsDistDir, { recursive: true });
-    const assets = await fs.readdir(assetsDir);
-    for (const asset of assets) {
-      const assetPath = path.join(assetsDir, asset);
-      const assetDistPath = path.join(assetsDistDir, asset);
-      await fs.copyFile(assetPath, assetDistPath)
-    }
-    console.log("assets directory copied successfully.");
+    await copyDir(assetsDir, path.join(assetsDistDir, 'assets'));
+    console.log("Page built succesfully");
   } catch (err) {
-    console.error(err);
+    console.error('Error building:', err);
   }
 }
+  async function copyDir(src, dest) {
+    const files = await fs.readdir(src, { withFileTypes: true });
+
+    await fs.mkdir(dest);
+
+    for (let file of files) {
+      const srcPath = path.join(src, file.name);
+      const destPath = path.join(dest, file.name);
+      if (file.isDirectory()) {
+        await copyDir(srcPath, destPath);
+      }
+      else {
+        if (path.extname(file.name) === '.html') {
+          throw new Error('You cant copy html file!');
+        }
+        await fs.copyFile(srcPath, destPath);
+      }
+    }
+  }
 
 buildPage();
