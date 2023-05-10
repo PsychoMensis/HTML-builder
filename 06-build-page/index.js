@@ -3,15 +3,20 @@ const path = require("path");
 
 async function buildPage() {
   try {
+    const distDir = path.join(__dirname, "project-dist");
+  
+    // Remove existing project-dist directory if it exists
+    await removeDirectory(distDir);
+  
     // Create project-dist directory
-    await fs.mkdir(path.join(__dirname, "project-dist"));
+    await fs.mkdir(distDir);
     console.log("project-dist directory created successfully.");
-
-    // Read the contents of the template.html file
-    const templateHtml = await fs.readFile(
-      path.join(__dirname, "template.html"),
-      "utf-8"
-    );
+  
+      // Read the contents of the template.html file
+      const templateHtml = await fs.readFile(
+        path.join(__dirname, "template.html"),
+        "utf-8"
+      );
 
     // Replace template tags with component content
     const regex = /{{(.+?)}}/g;
@@ -77,5 +82,29 @@ async function buildPage() {
       }
     }
   }
-
+  async function removeDirectory(dirPath) {
+    try {
+      const dirStats = await fs.stat(dirPath);
+  
+      if (dirStats.isDirectory()) {
+        const files = await fs.readdir(dirPath);
+        for (const file of files) {
+          const filePath = path.join(dirPath, file);
+          const fileStats = await fs.stat(filePath);
+  
+          if (fileStats.isDirectory()) {
+            await removeDirectory(filePath);
+          } else {
+            await fs.unlink(filePath);
+          }
+        }
+        await fs.rmdir(dirPath);
+      }
+    } catch (error) {
+      // Ignore the error if the directory doesn't exist
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+  }
 buildPage();
