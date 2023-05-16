@@ -8,8 +8,8 @@ const rl = readline.createInterface({
 
 const filePath = './02-write-file/text.txt';
 fs.writeFile(filePath, '', (err) => {
-    if (err) throw err;
-    console.log('Hello, please enter some text:');
+  if (err) throw err;
+  console.log('Hello, please enter some text:');
 });
 
 rl.on('line', (input) => {
